@@ -4,7 +4,6 @@ window.Wad = Wad;
 Wad.logs.verbosity = 1;
 let ignition = new Wad({source:'./ignition.mp3'});
 document.getElementById('ignition').addEventListener('click', async function(){
-	// await ignition.play()
 	await ignition.play();
 	console.log('ignition');
 	await ignition.play();
@@ -52,8 +51,6 @@ document.getElementById('sprite-ab').addEventListener('click', async function(){
 });
 
 let longClip = new Wad({source:'./do-re-mi.wav'});
-let clipHolder = new Wad.Poly()
-// clipHolder.add(longClip)
 document.getElementById('full-song').addEventListener('click', function(){
 	longClip.play().then(function(thatWad){
 		console.log('Clip finished.');
@@ -72,8 +69,6 @@ document.getElementById('reverse-full-song').addEventListener('click', function(
 	longClip.reverse();
 });
 document.getElementById('mute-full-song').addEventListener('click', function(){
-	console.log('hi!')
-	// calling setVolume(0) on a currently playing wad just  makes it really quiet. the next playback is actually silent
 	longClip.setVolume(0)
 });
 document.getElementById('unmute-full-song').addEventListener('click', function(){

@@ -362,7 +362,6 @@ class Wad {
 	setVolume(volume, timeConstant, label){
 		timeConstant = timeConstant || .01;
 		if ( label ) {
-			console.log('label!', label)
 			if ( this.gain.length > 0 ) {
 				for ( let i = 0; i < this.gain.length; i++ ) {
 					if ( this.gain[i].label === label ) {
@@ -373,12 +372,11 @@ class Wad {
 		}
 		else {
 			this.defaultVolume = volume;
-			if ( this.gain.length > 0 ) { this.gain[0].gain.cancelScheduledValues(context.currentTime) }
-			// if ( this.gain.length > 0 ) { this.gain[0].gain.setValueAtTime(volume, context.currentTime); }
-			if ( this.gain.length > 0 ) { this.gain[0].gain.setTargetAtTime(volume, context.currentTime, timeConstant); }
-			// if ( this.gain.length > 0 ) { this.gain[0].gain.value = volume; }
+			if ( this.gain.length > 0 ) {
+				this.gain[0].gain.cancelScheduledValues(context.currentTime) 
+				this.gain[0].gain.setTargetAtTime(volume, context.currentTime, timeConstant)
+			}
 		}
-		console.log('this!?', this)
 		return this;
 	}
 

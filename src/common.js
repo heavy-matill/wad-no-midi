@@ -375,7 +375,6 @@ let plugEmIn = function(that, arg){
 	else { // assume native interface
 		lastStop = that.nodes[that.nodes.length-1];
 	}
-	console.log('last stop -> destination', lastStop, destination)
 	lastStop.connect(destination);
 
 };
