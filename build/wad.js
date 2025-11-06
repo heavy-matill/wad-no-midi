@@ -21835,7 +21835,10 @@ class Wad {
 		}
 		else {
 			this.defaultVolume = volume;
-			if ( this.gain.length > 0 ) { this.gain[0].gain.setValueAtTime(volume, _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime); }
+			if ( this.gain.length > 0 ) {
+				this.gain[0].gain.cancelScheduledValues(_common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime) 
+				this.gain[0].gain.setTargetAtTime(volume, _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime, timeConstant)
+			}
 		}
 		return this;
 	}
@@ -21898,7 +21901,7 @@ class Wad {
 						this.gain[i].soundSource.frequency.setTargetAtTime(Wad.pitches[pitch], _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime, timeConstant);
 					}
 					else {
-						this.soundSource.frequency.settargetAtTime(pitch, _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime, timeConstant);
+						this.soundSource.frequency.setTargetAtTime(pitch, _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime, timeConstant);
 					}
 				}
 			}

@@ -372,7 +372,10 @@ class Wad {
 		}
 		else {
 			this.defaultVolume = volume;
-			if ( this.gain.length > 0 ) { this.gain[0].gain.setValueAtTime(volume, context.currentTime); }
+			if ( this.gain.length > 0 ) {
+				this.gain[0].gain.cancelScheduledValues(context.currentTime) 
+				this.gain[0].gain.setTargetAtTime(volume, context.currentTime, timeConstant)
+			}
 		}
 		return this;
 	}
@@ -435,7 +438,7 @@ class Wad {
 						this.gain[i].soundSource.frequency.setTargetAtTime(Wad.pitches[pitch], context.currentTime, timeConstant);
 					}
 					else {
-						this.soundSource.frequency.settargetAtTime(pitch, context.currentTime, timeConstant);
+						this.soundSource.frequency.setTargetAtTime(pitch, context.currentTime, timeConstant);
 					}
 				}
 			}
