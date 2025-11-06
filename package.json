@@ -5,9 +5,9 @@
 	"main": "build/wad.js",
 	"scripts": {
 		"build": "npm run build-compressed && npm run build-uncompressed && npm run build-tests",
-		"build-uncompressed": "webpack --config webpack.config.js",
-		"build-compressed": "webpack --config webpack.config.min.js",
-		"build-tests": "webpack --config webpack.config.test.js",
+		"build-uncompressed": "NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.config.js",
+		"build-compressed": "NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.config.min.js",
+		"build-tests": "NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.config.test.js",
 		"watch": "./node_modules/watch/cli.js 'npm run build' .",
 		"lint": "./node_modules/eslint/bin/eslint.js --fix ./src",
 		"test": "npx http-server ./test",

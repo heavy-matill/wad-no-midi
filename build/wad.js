@@ -20193,6 +20193,7 @@ let plugEmIn = function(that, arg){
 	else { // assume native interface
 		lastStop = that.nodes[that.nodes.length-1];
 	}
+	console.log('last stop -> destination', lastStop, destination)
 	lastStop.connect(destination);
 
 };
@@ -21825,6 +21826,7 @@ class Wad {
 	setVolume(volume, timeConstant, label){
 		timeConstant = timeConstant || .01;
 		if ( label ) {
+			console.log('label!', label)
 			if ( this.gain.length > 0 ) {
 				for ( let i = 0; i < this.gain.length; i++ ) {
 					if ( this.gain[i].label === label ) {
@@ -21835,8 +21837,12 @@ class Wad {
 		}
 		else {
 			this.defaultVolume = volume;
-			if ( this.gain.length > 0 ) { this.gain[0].gain.setValueAtTime(volume, _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime); }
+			if ( this.gain.length > 0 ) { this.gain[0].gain.cancelScheduledValues(_common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime) }
+			// if ( this.gain.length > 0 ) { this.gain[0].gain.setValueAtTime(volume, context.currentTime); }
+			if ( this.gain.length > 0 ) { this.gain[0].gain.setTargetAtTime(volume, _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime, timeConstant); }
+			// if ( this.gain.length > 0 ) { this.gain[0].gain.value = volume; }
 		}
+		console.log('this!?', this)
 		return this;
 	}
 
@@ -21898,7 +21904,7 @@ class Wad {
 						this.gain[i].soundSource.frequency.setTargetAtTime(Wad.pitches[pitch], _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime, timeConstant);
 					}
 					else {
-						this.soundSource.frequency.settargetAtTime(pitch, _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime, timeConstant);
+						this.soundSource.frequency.setTargetAtTime(pitch, _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime, timeConstant);
 					}
 				}
 			}
