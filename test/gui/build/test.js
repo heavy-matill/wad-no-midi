@@ -18624,7 +18624,7 @@ return /******/ (function(modules) { // webpackBootstrap
             writable: true,
             value: {
                 drive: {
-                    value: 0.197,
+                    value: 1,
                     min: 0,
                     max: 1,
                     automatable: true,
@@ -18632,7 +18632,7 @@ return /******/ (function(modules) { // webpackBootstrap
                     scaled: true
                 },
                 outputGain: {
-                    value: -9.154,
+                    value: 0,
                     min: -46,
                     max: 0,
                     automatable: true,
@@ -18640,7 +18640,7 @@ return /******/ (function(modules) { // webpackBootstrap
                     scaled: true
                 },
                 curveAmount: {
-                    value: 0.979,
+                    value: 0.725,
                     min: 0,
                     max: 1,
                     automatable: false,
@@ -18668,7 +18668,7 @@ return /******/ (function(modules) { // webpackBootstrap
                 return this.inputDrive.gain;
             },
             set: function(value) {
-                this.inputDrive.gain.value = value;
+                this._drive = value;
             }
         },
         curveAmount: {
@@ -18717,7 +18717,7 @@ return /******/ (function(modules) { // webpackBootstrap
                     var i, x, y;
                     for (i = 0; i < n_samples; i++) {
                         x = i * 2 / n_samples - 1;
-                        y = ((0.5 * Math.pow((x + 1.4), 2)) - 1) * (y >= 0 ? 5.8 : 1.2);
+                        y = ((0.5 * Math.pow((x + 1.4), 2)) - 1) * y >= 0 ? 5.8 : 1.2;
                         ws_table[i] = tanh(y);
                     }
                 },
@@ -18734,13 +18734,9 @@ return /******/ (function(modules) { // webpackBootstrap
                     for (i = 0; i < n_samples; i++) {
                         x = i * 2 / n_samples - 1;
                         abx = Math.abs(x);
-                        if (abx < a) {
-                            y = abx;
-                        } else if (abx > a) {
-                            y = a + (abx - a) / (1 + Math.pow((abx - a) / (1 - a), 2));
-                        } else if (abx > 1) {
-                            y = abx;
-                        }
+                        if (abx < a) y = abx;
+                        else if (abx > a) y = a + (abx - a) / (1 + Math.pow((abx - a) / (1 - a), 2));
+                        else if (abx > 1) y = abx;
                         ws_table[i] = sign(x) * y * (1 / ((a + 1) / 2));
                     }
                 },
@@ -19263,35 +19259,35 @@ return /******/ (function(modules) { // webpackBootstrap
                     type: BOOLEAN
                 },
                 baseFrequency: {
-                    value: 0.153,
+                    value: 0.5,
                     min: 0,
                     max: 1,
                     automatable: false,
                     type: FLOAT
                 },
                 excursionOctaves: {
-                    value: 3.3,
+                    value: 2,
                     min: 1,
                     max: 6,
                     automatable: false,
                     type: FLOAT
                 },
                 sweep: {
-                    value: 0.35,
+                    value: 0.2,
                     min: 0,
                     max: 1,
                     automatable: false,
                     type: FLOAT
                 },
                 resonance: {
-                    value: 19,
+                    value: 10,
                     min: 1,
                     max: 100,
                     automatable: false,
                     type: FLOAT
                 },
                 sensitivity: {
-                    value: -0.5,
+                    value: 0.5,
                     min: -1,
                     max: 1,
                     automatable: false,
@@ -19524,14 +19520,20 @@ return /******/ (function(modules) { // webpackBootstrap
                     channels = event.inputBuffer.numberOfChannels,
                     current, chan, rms, i;
                 chan = rms = i = 0;
-
-                for(chan = 0; chan < channels; ++chan) {
+                if (channels > 1) { //need to mixdown
                     for (i = 0; i < count; ++i) {
-                        current = event.inputBuffer.getChannelData(chan)[i];
+                        for (; chan < channels; ++chan) {
+                            current = event.inputBuffer.getChannelData(chan)[i];
+                            rms += (current * current) / channels;
+                        }
+                    }
+                } else {
+                    for (i = 0; i < count; ++i) {
+                        current = event.inputBuffer.getChannelData(0)[i];
                         rms += (current * current);
                     }
                 }
-                rms = Math.sqrt(rms / channels);
+                rms = Math.sqrt(rms);
 
                 if (this._envelope < rms) {
                     this._envelope *= this._attackC;
@@ -19974,10 +19976,7 @@ let getUserMedia = (function(window) {
 	}
     
 	return function() {
-		if ( window.location.hostname !== 'localhost' && window.location.protocol === 'http:' ) {
-			throw "The user's microphone can only be accessed via HTTPS or localhost. This page seems to be running on plain HTTP."
-		}
-		throw 'getUserMedia is unsupported. ';
+		throw 'getUserMedia is unsupported';
 	};
 }(window));
     
@@ -20359,6 +20358,7 @@ let setUpFilterOnPlay = function(that, arg){
 		createFilters(that, that);
 	}
 };
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Initialize and configure a convolver node for playback **/
 let setUpReverbOnPlay = function(that, arg){
@@ -20380,6 +20380,7 @@ let setUpReverbOnPlay = function(that, arg){
 	that.reverb.node = reverbNode;
 	that.nodes.push(that.reverb.node);
 };
+//////////////////////////////////////////////////////////////
 
 
 /** Initialize and configure a panner node for playback **/
@@ -20529,8 +20530,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _polywad__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./polywad */ "./src/polywad.js");
 /* harmony import */ var _presets__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./presets */ "./src/presets.js");
 /* harmony import */ var _pitches__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./pitches */ "./src/pitches.js");
-/* harmony import */ var _wad_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./wad.js */ "./src/wad.js");
-/* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./common */ "./src/common.js");
+/* harmony import */ var _midi__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./midi */ "./src/midi.js");
+/* harmony import */ var _wad_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./wad.js */ "./src/wad.js");
+/* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./common */ "./src/common.js");
 
 
 
@@ -20539,14 +20541,19 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-let Wad = _wad_js__WEBPACK_IMPORTED_MODULE_4__["default"];
+
+let Wad = _wad_js__WEBPACK_IMPORTED_MODULE_5__["default"];
 Wad.Poly = _polywad__WEBPACK_IMPORTED_MODULE_1__["default"];
 Wad.SoundIterator = function(args){ return new _sound_iterator__WEBPACK_IMPORTED_MODULE_0__["default"](args, Wad); };
 Wad.pitches = _pitches__WEBPACK_IMPORTED_MODULE_3__["pitches"];
 Wad.pitchesArray = _pitches__WEBPACK_IMPORTED_MODULE_3__["pitchesArray"];
+Wad.midiMap = _midi__WEBPACK_IMPORTED_MODULE_4__["midiMap"];
+Wad.assignMidiMap = _midi__WEBPACK_IMPORTED_MODULE_4__["assignMidiMap"];
+Wad.midiInstrument = _midi__WEBPACK_IMPORTED_MODULE_4__["midiInstrument"];
+Wad.midiInputs = _midi__WEBPACK_IMPORTED_MODULE_4__["midiInputs"];
 Wad.presets = _presets__WEBPACK_IMPORTED_MODULE_2__["default"];
-Wad._common = _common__WEBPACK_IMPORTED_MODULE_5__;
-Wad.logs = _common__WEBPACK_IMPORTED_MODULE_5__["logStats"];
+Wad._common = _common__WEBPACK_IMPORTED_MODULE_6__;
+Wad.logs = _common__WEBPACK_IMPORTED_MODULE_6__["logStats"];
 
 
 if(  true && module.exports) { module.exports = Wad; }
@@ -20555,6 +20562,111 @@ if(  true && module.exports) { module.exports = Wad; }
 
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../node_modules/webpack/buildin/harmony-module.js */ "./node_modules/webpack/buildin/harmony-module.js")(module)))
+
+/***/ }),
+
+/***/ "./src/midi.js":
+/*!*********************!*\
+  !*** ./src/midi.js ***!
+  \*********************/
+/*! exports provided: midiMap, assignMidiMap, midiInstrument, midiInputs */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "midiMap", function() { return midiMap; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "assignMidiMap", function() { return assignMidiMap; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "midiInstrument", function() { return midiInstrument; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "midiInputs", function() { return midiInputs; });
+/* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./common */ "./src/common.js");
+/* harmony import */ var _pitches__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./pitches */ "./src/pitches.js");
+
+
+
+
+let assignMidiMap = function(midiMap, which, success, failure){
+	which = which || 0;
+	navigator.requestMIDIAccess().then(function(){
+		if ( midiInputs[which] ) {
+			midiInputs[which].onmidimessage = midiMap;
+			if  ( typeof success === 'function' ) { success(); }
+		}
+		else if ( typeof failure === 'function' ) { failure(); }
+	});
+};
+let midiInstrument = {
+	play : function() { Object(_common__WEBPACK_IMPORTED_MODULE_0__["logMessage"])('playing midi');  },
+	stop : function() { Object(_common__WEBPACK_IMPORTED_MODULE_0__["logMessage"])('stopping midi'); }
+};
+
+let midiInputs  = [];
+
+let midiMap = function(event){
+	Object(_common__WEBPACK_IMPORTED_MODULE_0__["logMessage"])(event.receivedTime, event.data, 2);
+	if ( event.data[0] === 144 ) { // 144 means the midi message has note data
+		if ( event.data[2] === 0 ) { // noteOn velocity of 0 means this is actually a noteOff message
+			Object(_common__WEBPACK_IMPORTED_MODULE_0__["logMessage"])('Playing note: ', 2);
+			Object(_common__WEBPACK_IMPORTED_MODULE_0__["logMessage"])(_pitches__WEBPACK_IMPORTED_MODULE_1__["pitchesArray"][event.data[1]-12], 2);
+			midiInstrument.stop(_pitches__WEBPACK_IMPORTED_MODULE_1__["pitchesArray"][event.data[1]-12]);
+		}
+		else if ( event.data[2] > 0 ) {
+			Object(_common__WEBPACK_IMPORTED_MODULE_0__["logMessage"])('Stopping note: ', 2);
+			Object(_common__WEBPACK_IMPORTED_MODULE_0__["logMessage"])(_pitches__WEBPACK_IMPORTED_MODULE_1__["pitchesArray"][event.data[1]-12], 2);
+			midiInstrument.play({pitch : _pitches__WEBPACK_IMPORTED_MODULE_1__["pitchesArray"][event.data[1]-12], label : _pitches__WEBPACK_IMPORTED_MODULE_1__["pitchesArray"][event.data[1]-12] });
+		}
+	}
+	else if ( event.data[0] === 176 ) { // 176 means the midi message has controller data
+		Object(_common__WEBPACK_IMPORTED_MODULE_0__["logMessage"])('controller');
+		if ( event.data[1] == 46 ) {
+			if ( event.data[2] == 127 ) { midiInstrument.pedalMod = true; }
+			else if ( event.data[2] == 0 ) { midiInstrument.pedalMod = false; }
+		}
+	}
+	else if ( event.data[0] === 224 ) { // 224 means the midi message has pitch bend data
+		Object(_common__WEBPACK_IMPORTED_MODULE_0__["logMessage"])('pitch bend');
+	}
+};
+
+
+let onSuccessCallback = function(midiAccess){
+
+	midiInputs = [];
+	var val = midiAccess.inputs.values();
+	for ( var o = val.next(); !o.done; o = val.next() ) {
+		midiInputs.push(o.value);
+	}
+	// Wad.midiInputs = [m.inputs.values().next().value];   // inputs = array of MIDIPorts
+	Object(_common__WEBPACK_IMPORTED_MODULE_0__["logMessage"])('MIDI inputs: ');
+	Object(_common__WEBPACK_IMPORTED_MODULE_0__["logMessage"])(midiInputs);
+	// var outputs = m.outputs(); // outputs = array of MIDIPorts
+	for ( var i = 0; i < midiInputs.length; i++ ) {
+		midiInputs[i].onmidimessage = midiMap; // onmidimessage( event ), event.data & event.receivedTime are populated
+	}
+	// var o = m.outputs()[0];           // grab first output device
+	// o.send( [ 0x90, 0x45, 0x7f ] );     // full velocity note on A4 on channel zero
+	// o.send( [ 0x80, 0x45, 0x7f ], window.performance.now() + 1000 );  // full velocity A4 note off in one second.
+};
+
+let onErrorCallback = function(err){
+	Object(_common__WEBPACK_IMPORTED_MODULE_0__["logMessage"])('Failed to get MIDI access', err);
+};
+
+(async function(){
+
+	if ( navigator && navigator.requestMIDIAccess ) {
+		try {
+			let midiAccess = await navigator.requestMIDIAccess();
+			onSuccessCallback(midiAccess);
+		}
+		catch(err) {
+			onErrorCallback();
+		}
+	}
+})();
+
+
+
+
 
 /***/ }),
 
@@ -21201,6 +21313,11 @@ class Polywad {
 }
 
 
+
+
+
+
+
 /* harmony default export */ __webpack_exports__["default"] = (Polywad);
 
 
@@ -21549,7 +21666,7 @@ class Wad {
 
 	/**
 	 * @typedef {object} WadConfig
-	 * @property {'sine'|'square'|'sawtooth'|'triangle'|'noise'|'mic'|string} source - sine, square, sawtooth, triangle, or noise for oscillators, mic for live microphone input, or any string to play an audio file.
+	 * @property {'sine'|'square'|'sawtooth'|'triangle'|'noise'} source - sine, square, sawtooth, triangle, or noise
 	 * @property {number} [volume] - From 0 to 1
 	 * @property {string|number} [pitch] - Set a default pitch on the constructor if you don't want to set the pitch on play(). Pass in a string like 'c#3' to play a specific pitch, or pass in a number to play that frequency, in hertz.
 	 * @property {number} [detune] - Detune is measured in cents. 100 cents is equal to 1 semitone.
@@ -21814,10 +21931,7 @@ class Wad {
 		}
 		else {
 			this.defaultVolume = volume;
-			if ( this.gain.length > 0 ) {
-				this.gain[0].gain.cancelScheduledValues(_common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime) 
-				this.gain[0].gain.setTargetAtTime(volume, _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime, timeConstant)
-			}
+			if ( this.gain.length > 0 ) { this.gain[0].gain.setValueAtTime(volume, _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime); }
 		}
 		return this;
 	}
@@ -21880,7 +21994,7 @@ class Wad {
 						this.gain[i].soundSource.frequency.setTargetAtTime(Wad.pitches[pitch], _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime, timeConstant);
 					}
 					else {
-						this.soundSource.frequency.setTargetAtTime(pitch, _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime, timeConstant);
+						this.soundSource.frequency.settargetAtTime(pitch, _common__WEBPACK_IMPORTED_MODULE_2__["context"].currentTime, timeConstant);
 					}
 				}
 			}
@@ -22273,6 +22387,7 @@ window.Wad = _build_wad_js__WEBPACK_IMPORTED_MODULE_0___default.a;
 _build_wad_js__WEBPACK_IMPORTED_MODULE_0___default.a.logs.verbosity = 1;
 let ignition = new _build_wad_js__WEBPACK_IMPORTED_MODULE_0___default.a({source:'./ignition.mp3'});
 document.getElementById('ignition').addEventListener('click', async function(){
+	// await ignition.play()
 	await ignition.play();
 	console.log('ignition');
 	await ignition.play();
@@ -22336,12 +22451,6 @@ document.getElementById('stop-full-song').addEventListener('click', function(){
 });
 document.getElementById('reverse-full-song').addEventListener('click', function(){
 	longClip.reverse();
-});
-document.getElementById('mute-full-song').addEventListener('click', function(){
-	longClip.setVolume(0)
-});
-document.getElementById('unmute-full-song').addEventListener('click', function(){
-	longClip.setVolume(1);
 });
 
 let sine = new _build_wad_js__WEBPACK_IMPORTED_MODULE_0___default.a({source:'sine', env: {attack: .07, hold: 1.5, release: .6}});
@@ -22466,9 +22575,8 @@ document.getElementById('mic-consent').addEventListener('click', function(){
 			}
 		},
 	});
-	tuner.setVolume(0) // mute the tuner to avoid feedback
+	// tuner.setVolume(0) // mute the tuner to avoid feedback
 	tuner.add(voice);
-	console.log('eh?')
 
 });
 
