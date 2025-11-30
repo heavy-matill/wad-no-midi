@@ -5,12 +5,6 @@ import {
 	pitches,
 	pitchesArray,
 } from './pitches';
-import {
-	midiMap,
-	assignMidiMap,
-	midiInputs,
-	midiInstrument,
-} from './midi';
 import WebAudioDAW from './wad.js';
 import { logStats } from './common';
 import * as common from './common';
@@ -20,10 +14,6 @@ Wad.Poly = Polywad;
 Wad.SoundIterator = function(args){ return new SoundIterator(args, Wad); };
 Wad.pitches = pitches;
 Wad.pitchesArray = pitchesArray;
-Wad.midiMap = midiMap;
-Wad.assignMidiMap = assignMidiMap;
-Wad.midiInstrument = midiInstrument;
-Wad.midiInputs = midiInputs;
 Wad.presets = presets;
 Wad._common = common;
 Wad.logs = logStats;
