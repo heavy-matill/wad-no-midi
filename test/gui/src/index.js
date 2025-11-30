@@ -4,7 +4,6 @@ window.Wad = Wad;
 Wad.logs.verbosity = 1;
 let ignition = new Wad({source:'./ignition.mp3'});
 document.getElementById('ignition').addEventListener('click', async function(){
-	// await ignition.play()
 	await ignition.play();
 	console.log('ignition');
 	await ignition.play();
@@ -68,6 +67,12 @@ document.getElementById('stop-full-song').addEventListener('click', function(){
 });
 document.getElementById('reverse-full-song').addEventListener('click', function(){
 	longClip.reverse();
+});
+document.getElementById('mute-full-song').addEventListener('click', function(){
+	longClip.setVolume(0)
+});
+document.getElementById('unmute-full-song').addEventListener('click', function(){
+	longClip.setVolume(1);
 });
 
 let sine = new Wad({source:'sine', env: {attack: .07, hold: 1.5, release: .6}});
@@ -192,8 +197,9 @@ document.getElementById('mic-consent').addEventListener('click', function(){
 			}
 		},
 	});
-	// tuner.setVolume(0) // mute the tuner to avoid feedback
+	tuner.setVolume(0) // mute the tuner to avoid feedback
 	tuner.add(voice);
+	console.log('eh?')
 
 });
 
